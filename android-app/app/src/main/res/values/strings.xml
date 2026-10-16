@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">נוכחות NFC</string>
+    <string name="login_title">כניסת עובד</string>
+    <string name="username">שם משתמש</string>
+    <string name="password">סיסמה</string>
+    <string name="login">התחברות</string>
+    <string name="clock_in">כניסה</string>
+    <string name="clock_out">יציאה</string>
+    <string name="history">היסטוריה</string>
+    <string name="profile">פרופיל</string>
+    <string name="logout">התנתקות</string>
+    <string name="scan_hint">הצמידו את הטלפון לתג NFC בתחנה</string>
+    <string name="nfc_disabled">NFC כבוי. הפעילו NFC בהגדרות המכשיר.</string>
+    <string name="nfc_unsupported">המכשיר אינו תומך ב-NFC.</string>
+    <string name="nfc_read_failed">לא ניתן לקרוא את התג. נסו שוב.</string>
+</resources>

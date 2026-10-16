@@ -1,0 +1,26 @@
+# Java / Maven
+backend/target/
+*.class
+*.jar
+*.war
+.idea/
+*.iml
+
+# Node
+admin-frontend/node_modules/
+admin-frontend/dist/
+admin-frontend/.env
+
+# Android
+android-app/.gradle/
+android-app/build/
+android-app/app/build/
+android-app/local.properties
+*.apk
+*.aab
+
+# OS / editor
+.DS_Store
+.vscode/
+*.log
+.env

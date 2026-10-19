@@ -11,7 +11,7 @@ Native Java Android application for employees to clock in/out by scanning workpl
 
 ## Configure API URL
 
-Default physical-phone URL is `http://10.0.0.12:8080` (change to your PC LAN IP).
+Default physical-phone URL is `http://10.0.0.16:8080` (change to your PC LAN IP).
 
 For emulator, use `http://10.0.2.2:8080` in `app/build.gradle`:
 

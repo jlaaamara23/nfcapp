@@ -13,7 +13,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         // Physical phone on LAN: use your PC IP. Emulator: use http://10.0.2.2:8080
-        buildConfigField "String", "API_BASE_URL", "\"http://10.0.0.12:8080\""
+        buildConfigField "String", "API_BASE_URL", "\"http://10.0.0.16:8080\""
     }
 
     buildTypes {

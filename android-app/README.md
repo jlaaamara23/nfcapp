@@ -11,13 +11,16 @@ Native Java Android application for employees to clock in/out by scanning workpl
 
 ## Configure API URL
 
-Default emulator URL is `http://10.0.2.2:8080` (host machine localhost).
+Default physical-phone URL is `http://10.0.0.16:8080` (change to your PC LAN IP).
 
-For a physical Samsung phone on the same LAN, edit `app/build.gradle`:
+For emulator, use `http://10.0.2.2:8080` in `app/build.gradle`:
 
 ```gradle
 buildConfigField "String", "API_BASE_URL", "\"http://YOUR_LAN_IP:8080\""
 ```
+
+Cleartext HTTP is allowed in development via `network_security_config.xml` and
+`android:usesCleartextTraffic="true"`. Use HTTPS in production.
 
 ## Build & install APK
 

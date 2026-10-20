@@ -4,16 +4,16 @@ plugins {
 
 android {
     namespace 'com.nfcattendance.employee'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.nfcattendance.employee"
         minSdk 26
-        targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
-        // Physical phone on LAN: use your PC IP. Emulator: use http://10.0.2.2:8080
-        buildConfigField "String", "API_BASE_URL", "\"http://10.0.0.16:8080\""
+        targetSdk 36
+        versionCode 3
+        versionName "1.0.2"
+        // Production API (Play Store / VPS). For local LAN testing temporarily use http://YOUR_PC_IP:8080
+        buildConfigField "String", "API_BASE_URL", "\"https://api.sreamline.tech\""
     }
 
     buildTypes {

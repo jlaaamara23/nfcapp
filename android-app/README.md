@@ -75,12 +75,10 @@ versionCode 2   // must increase every upload
 versionName "1.0.1"
 ```
 
-## Seed login (development)
+## Employee login
 
-- Username: `employee1`
-- Password: `Employee123!`
-
-Create real employees from the Admin panel: `https://admin.sreamline.tech`
+Create employees from the Admin panel: `https://admin.sreamline.tech`.
+The phone login screen is empty until the employee types their own username and password.
 
 ## NFC tag payload
 

@@ -27,6 +27,11 @@ public class AdminUserService {
     private final AuditService auditService;
 
     @Transactional(readOnly = true)
+    public boolean existsAdmin() {
+        return userAccountRepository.existsByRole(RoleName.ADMIN);
+    }
+
+    @Transactional(readOnly = true)
     public List<AdminUserDtos.AdminUserResponse> listAdmins() {
         return userAccountRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> r.getName() == RoleName.ADMIN))

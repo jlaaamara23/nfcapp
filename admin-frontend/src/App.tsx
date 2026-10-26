@@ -12,7 +12,8 @@ import { AdminsPage } from './pages/AdminsPage';
 import { AuditPage } from './pages/AuditPage';
 
 function Protected({ children }: { children: React.ReactNode }) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, ready } = useAuth();
+  if (!ready) return <p className="muted" style={{ padding: '2rem' }}>טוען...</p>;
   if (!user || !isAdmin) return <Navigate to="/login" replace />;
   return children;
 }

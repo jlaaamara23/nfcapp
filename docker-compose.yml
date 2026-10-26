@@ -30,6 +30,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-nfc_dev_password}
       APP_JWT_SECRET: ${APP_JWT_SECRET:-change-me-to-a-long-random-secret-at-least-32-chars}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://2.24.44.228:5173,http://2.24.44.228}
+      APP_SEED_ENABLED: ${APP_SEED_ENABLED:-false}
     ports:
       - "8080:8080"
 

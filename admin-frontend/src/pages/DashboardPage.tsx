@@ -1,18 +1,33 @@
 import { useEffect, useState } from 'react';
-import { api, type DashboardStats } from '../api/client';
+import { AuthExpiredError, api, type DashboardStats } from '../api/client';
+import { useAuth } from '../auth/AuthContext';
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!user) return;
     api
       .dashboard()
       .then(setStats)
-      .catch((e: Error) => setError(e.message));
-  }, []);
+      .catch((e: Error) => {
+        if (e instanceof AuthExpiredError) return;
+        setError(e.message);
+      });
+  }, [user]);
 
-  if (error) return <div className="error">{error}</div>;
+  if (error) {
+    return (
+      <section className="page">
+        <header className="page-header">
+          <h1>לוח בקרה</h1>
+        </header>
+        <div className="error">{error}</div>
+      </section>
+    );
+  }
   if (!stats) return <p>טוען לוח בקרה...</p>;
 
   const cards = [

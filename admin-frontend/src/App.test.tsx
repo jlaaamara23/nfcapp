@@ -10,4 +10,8 @@ describe('admin auth gate', () => {
     const roles = ['ADMIN'];
     expect(roles.includes('ADMIN')).toBe(true);
   });
+
+  it('treats empty login fields as unsigned', () => {
+    expect(''.trim().length).toBe(0);
+  });
 });

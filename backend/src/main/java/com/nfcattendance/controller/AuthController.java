@@ -16,6 +16,18 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @GetMapping("/setup-status")
+    @Operation(summary = "Whether the first admin account still needs to be created")
+    public AuthDtos.SetupStatus setupStatus() {
+        return authService.setupStatus();
+    }
+
+    @PostMapping("/bootstrap")
+    @Operation(summary = "Create the first admin account when none exist")
+    public AuthDtos.AuthResponse bootstrap(@Valid @RequestBody AuthDtos.BootstrapRequest request) {
+        return authService.bootstrap(request);
+    }
+
     @PostMapping("/login")
     @Operation(summary = "Login and receive JWT")
     public AuthDtos.AuthResponse login(@Valid @RequestBody AuthDtos.LoginRequest request) {

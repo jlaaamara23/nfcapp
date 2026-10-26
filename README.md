@@ -85,15 +85,9 @@ Open http://localhost:5173
 
 See [`android-app/README.md`](android-app/README.md) for APK build/install steps.
 
-## Seed accounts (development only)
+## First login
 
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `Admin123!` |
-| Employee | `employee1` | `Employee123!` |
-| Employee | `employee2` | `Employee123!` |
-
-Seeded NFC station: `GATE-01` (registration payload shown in Admin → תחנות NFC).
+The admin login form is empty. On a new database, open the admin site and create the first admin account. Then add employees from **עובדים**. Optional demo NFC station `GATE-01` is created only when `APP_SEED_ENABLED=true`.
 
 ## Core API examples
 
@@ -102,7 +96,7 @@ Seeded NFC station: `GATE-01` (registration payload shown in Admin → תחנו�
 ```bash
 curl -s -X POST http://localhost:8080/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"Admin123!"}'
+  -d '{"username":"YOUR_ADMIN","password":"YOUR_PASSWORD"}'
 ```
 
 ### Admin list employees

@@ -1,14 +1,24 @@
 import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { api } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 
 export function LoginPage() {
-  const { user, login, isAdmin } = useAuth();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin123!');
+  const { user, login, bootstrap, isAdmin } = useAuth();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsBootstrap, setNeedsBootstrap] = useState(false);
+
+  useEffect(() => {
+    api
+      .setupStatus()
+      .then((status) => setNeedsBootstrap(status.needsBootstrap))
+      .catch(() => setNeedsBootstrap(false));
+  }, []);
 
   if (user && isAdmin) {
     return <Navigate to="/" replace />;
@@ -19,7 +29,11 @@ export function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      await login(username, password);
+      if (needsBootstrap) {
+        await bootstrap(username, email, password);
+      } else {
+        await login(username, password);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'התחברות נכשלה');
     } finally {
@@ -32,24 +46,46 @@ export function LoginPage() {
       <div className="login-backdrop" />
       <form className="login-panel" onSubmit={onSubmit}>
         <p className="eyebrow">מערכת נוכחות NFC</p>
-        <h1>כניסת מנהל</h1>
-        <p className="muted">גישה ללוח הניהול מותרת למשתמשי ADMIN בלבד.</p>
+        <h1>{needsBootstrap ? 'יצירת מנהל ראשון' : 'כניסת מנהל'}</h1>
+        <p className="muted">
+          {needsBootstrap
+            ? 'אין עדיין מנהל במערכת. צרו את חשבון המנהל הראשון.'
+            : 'גישה ללוח הניהול מותרת למשתמשי ADMIN בלבד.'}
+        </p>
         <label>
           שם משתמש
-          <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            required
+          />
         </label>
+        {needsBootstrap && (
+          <label>
+            אימייל
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </label>
+        )}
         <label>
           סיסמה
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
+            autoComplete={needsBootstrap ? 'new-password' : 'current-password'}
+            required
           />
         </label>
         {error && <div className="error">{error}</div>}
         <button type="submit" disabled={loading}>
-          {loading ? 'מתחבר...' : 'התחברות'}
+          {loading ? 'שומר...' : needsBootstrap ? 'יצירת מנהל' : 'התחברות'}
         </button>
       </form>
     </div>

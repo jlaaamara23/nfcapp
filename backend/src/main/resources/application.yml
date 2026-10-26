@@ -21,6 +21,8 @@ spring:
     locations: classpath:db/migration
 
 app:
+  seed:
+    enabled: ${APP_SEED_ENABLED:false}
   jwt:
     secret: ${APP_JWT_SECRET:change-me-to-a-long-random-secret-at-least-32-chars}
     expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}

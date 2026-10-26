@@ -35,9 +35,6 @@ public class LoginActivity extends AppCompatActivity {
         TextView errorText = findViewById(R.id.errorText);
         Button loginButton = findViewById(R.id.loginButton);
 
-        usernameInput.setText("employee1");
-        passwordInput.setText("Employee123!");
-
         loginButton.setOnClickListener(v -> {
             errorText.setVisibility(View.GONE);
             loginButton.setEnabled(false);

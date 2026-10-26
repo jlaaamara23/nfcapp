@@ -91,6 +91,38 @@ class SecurityAndAttendanceIntegrationTest {
     }
 
     @Test
+    void unauthenticatedDashboardReturnsUnauthorizedJson() throws Exception {
+        mockMvc.perform(get("/api/admin/reports/dashboard"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("יש להתחבר"));
+    }
+
+    @Test
+    void bootstrapCreatesFirstAdminThenRejectsSecond() throws Exception {
+        employeeRepository.deleteAll();
+        userAccountRepository.deleteAll();
+        mockMvc.perform(get("/api/auth/setup-status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsBootstrap").value(true));
+
+        mockMvc.perform(post("/api/auth/bootstrap")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"owner\",\"email\":\"owner@test.com\",\"password\":\"Owner123!\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("owner"))
+                .andExpect(jsonPath("$.accessToken").isNotEmpty());
+
+        mockMvc.perform(get("/api/auth/setup-status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.needsBootstrap").value(false));
+
+        mockMvc.perform(post("/api/auth/bootstrap")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"other\",\"email\":\"other@test.com\",\"password\":\"Owner123!\"}"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     void employeeCannotAccessAdminEmployees() throws Exception {
         String token = login("emp", "Employee123!");
         mockMvc.perform(get("/api/admin/employees")

@@ -10,8 +10,8 @@ android {
         applicationId "com.nfcattendance.employee"
         minSdk 26
         targetSdk 36
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
         // Production API (Play Store / VPS). For local LAN testing temporarily use http://YOUR_PC_IP:8080
         buildConfigField "String", "API_BASE_URL", "\"https://api.sreamline.tech\""
     }

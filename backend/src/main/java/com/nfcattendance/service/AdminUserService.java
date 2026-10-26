@@ -28,7 +28,7 @@ public class AdminUserService {
 
     @Transactional(readOnly = true)
     public boolean existsAdmin() {
-        return userAccountRepository.existsByRole(RoleName.ADMIN);
+        return userAccountRepository.existsAdmin();
     }
 
     @Transactional(readOnly = true)

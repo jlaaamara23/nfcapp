@@ -13,6 +13,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
-    @Query("select count(u) > 0 from UserAccount u join u.roles r where r.name = :role")
-    boolean existsByRole(RoleName role);
+    @Query(value = "select exists (select 1 from user_roles ur join roles r on r.id = ur.role_id where r.name = 'ADMIN')", nativeQuery = true)
+    boolean existsAdmin();
 }

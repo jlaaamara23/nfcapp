@@ -36,6 +36,7 @@
             android:background="@color/white"
             android:hint="@string/username"
             android:inputType="text"
+            android:importantForAutofill="no"
             android:padding="14dp" />
 
         <EditText

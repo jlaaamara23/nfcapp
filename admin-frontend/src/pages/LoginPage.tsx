@@ -44,7 +44,7 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-backdrop" />
-      <form className="login-panel" onSubmit={onSubmit}>
+      <form className="login-panel" onSubmit={onSubmit} autoComplete="off">
         <p className="eyebrow">מערכת נוכחות NFC</p>
         <h1>{needsBootstrap ? 'יצירת מנהל ראשון' : 'כניסת מנהל'}</h1>
         <p className="muted">
@@ -57,7 +57,8 @@ export function LoginPage() {
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            autoComplete="username"
+            autoComplete="off"
+            name="nfc-admin-username"
             required
           />
         </label>
@@ -68,7 +69,8 @@ export function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              autoComplete="off"
+              name="nfc-admin-email"
               required
             />
           </label>
@@ -79,7 +81,8 @@ export function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete={needsBootstrap ? 'new-password' : 'current-password'}
+            autoComplete="new-password"
+            name="nfc-admin-password"
             required
           />
         </label>

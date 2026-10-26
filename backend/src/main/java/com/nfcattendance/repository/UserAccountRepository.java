@@ -1,6 +1,5 @@
 package com.nfcattendance.repository;
 
-import com.nfcattendance.entity.RoleName;
 import com.nfcattendance.entity.UserAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

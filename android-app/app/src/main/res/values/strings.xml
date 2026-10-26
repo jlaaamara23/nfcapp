@@ -2,8 +2,12 @@
 <resources>
     <string name="app_name">נוכחות NFC</string>
     <string name="login_title">כניסת עובד</string>
+    <string name="login_subtitle">שעון נוכחות חכם לעובדים</string>
+    <string name="login_hint">הזינו את פרטי העובד שקיבלתם מהמנהל</string>
     <string name="username">שם משתמש</string>
     <string name="password">סיסמה</string>
+    <string name="username_hint">שם המשתמש שלכם</string>
+    <string name="password_hint">הסיסמה שלכם</string>
     <string name="login">התחברות</string>
     <string name="clock_in">כניסה</string>
     <string name="clock_out">יציאה</string>

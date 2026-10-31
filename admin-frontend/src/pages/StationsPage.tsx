@@ -35,8 +35,9 @@ export function StationsPage() {
       <header className="page-header">
         <h1>ניהול תחנות NFC</h1>
         <p>
-          תג NTAG מכיל מזהה תחנה בלבד — לא סוד זהות. האפליקציה שולחת את המזהה יחד עם JWT מאומת.
-          להגנה מחזקה יותר מומלץ תגיות קריפטוגרפיות (NTAG 424 DNA), אתגור מסתובב ו-geo-fencing.
+          תג אחד לאייפון ולגלקסי. כתבו ב-NFC Tools פעם אחת את «Payload לתג» ככתובת URL — לא שתי
+          רשומות נפרדות, כי הכתיבה השנייה מוחקת את הראשונה. הנוכחות נשמרת בשרת לפי חשבון העובד,
+          לא לפי הטלפון: כניסה בגלקסי מופיעה גם באייפון. התג מכיל מזהה תחנה בלבד, לא סוד זהות.
         </p>
       </header>
       <form className="filters panel" onSubmit={onSubmit}>
@@ -86,6 +87,12 @@ export function StationsPage() {
                 </td>
                 <td>
                   <code className="wrap">{s.nfcPayload}</code>
+                  <button
+                    type="button"
+                    onClick={() => void navigator.clipboard.writeText(s.nfcPayload)}
+                  >
+                    העתקה
+                  </button>
                 </td>
                 <td>{s.status}</td>
                 <td className="actions">

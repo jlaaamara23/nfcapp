@@ -64,12 +64,16 @@ export function stationFromPageUrl(href = typeof window === 'undefined' ? '' : w
   return extractStationCode(href)
 }
 
-export function tagUrlForStation(code: string): string {
-  return `${EMPLOYEE_SITE_URL}/?station=${encodeURIComponent(code.trim().toUpperCase())}`
+export function tagUrlForStation(code: string, registrationValue?: string): string {
+  const station = code.trim().toUpperCase()
+  const app = `nfcattendance://station/${station}${
+    registrationValue ? `?rv=${encodeURIComponent(registrationValue)}` : ''
+  }`
+  return `${EMPLOYEE_SITE_URL}/?station=${encodeURIComponent(station)}#${app}`
 }
 
 export function iphoneTagHelp(): string {
-  return `האייפון קורא תגים במערכת, אבל ספארי לא נותן לאתר לסרוק תג אחרי לחיצה. כתבו על התג כתובת אתר (URL), למשל ${tagUrlForStation('GATE-01')}. אחר כך לחצו כניסה והצמידו לתג — יופיע באנר למעלה, לחצו עליו.`
+  return `תג אחד לאייפון ולגלקסי — כתבו פעם אחת ככתובת URL, למשל ${tagUrlForStation('GATE-01')}. אל תכתבו שני פורמטים על אותו תג (הכתיבה השנייה מוחקת את הראשונה). באייפון לחצו כניסה והצמידו לתג, ואז לבאנר למעלה. הנוכחות נשמרת בשרת לפי חשבון העובד, לא לפי הטלפון.`
 }
 
 function storage(): Storage | null {

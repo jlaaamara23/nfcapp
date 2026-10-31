@@ -33,6 +33,7 @@ app:
   security:
     max-failed-logins: 5
     lockout-minutes: 15
+  employee-web-url: ${APP_EMPLOYEE_WEB_URL:https://nfcapp-nine.vercel.app}
 
 springdoc:
   api-docs:

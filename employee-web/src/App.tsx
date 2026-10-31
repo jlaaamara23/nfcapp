@@ -3,15 +3,14 @@ import {
   api,
   clearAuth,
   formatHours,
-  getLastStation,
   getStoredAuth,
   isEmployee,
   saveAuth,
-  saveLastStation,
   type AttendanceRow,
   type AuthUser,
   type TodaySummary,
 } from './api'
+import { nfcSupported, readStationFromNfc } from './nfc'
 
 type Screen = 'home' | 'history'
 
@@ -19,10 +18,10 @@ export default function App() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredAuth())
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [station, setStation] = useState(() => getLastStation())
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
+  const [scanning, setScanning] = useState(false)
   const [screen, setScreen] = useState<Screen>('home')
   const [today, setToday] = useState<TodaySummary | null>(null)
   const [history, setHistory] = useState<AttendanceRow[]>([])
@@ -65,24 +64,22 @@ export default function App() {
 
   async function onClock(mode: 'CLOCK_IN' | 'CLOCK_OUT') {
     if (!user) return
-    const code = station.trim()
-    if (!code) {
-      setError('יש למלא קוד תחנה, למשל GATE-01')
-      return
-    }
     setLoading(true)
+    setScanning(true)
     setError('')
-    setInfo('')
+    setInfo(mode === 'CLOCK_IN' ? 'הצמידו את הטלפון לתג NFC...' : 'הצמידו את הטלפון לתג ליציאה...')
     try {
-      saveLastStation(code)
+      const code = await readStationFromNfc()
       const row = await api.clock(user.accessToken, mode, code)
-      setInfo(mode === 'CLOCK_IN' ? 'כניסה נרשמה' : 'יציאה נרשמה')
+      setInfo(mode === 'CLOCK_IN' ? `כניסה נרשמה · ${code}` : `יציאה נרשמה · ${code}`)
       await refresh(user)
       setHistory((prev) => [row, ...prev].slice(0, 30))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'הפעולה נכשלה')
+      setInfo('')
     } finally {
       setLoading(false)
+      setScanning(false)
     }
   }
 
@@ -149,21 +146,18 @@ export default function App() {
             <strong>{today?.statusLabel || 'טוען סטטוס...'}</strong>
             <span>שעות היום: {formatHours(today?.workedMinutesToday)}</span>
           </div>
-          <label>
-            קוד תחנה
-            <input
-              value={station}
-              onChange={(e) => setStation(e.target.value.toUpperCase())}
-              placeholder="GATE-01"
-            />
-          </label>
+          <p className="muted">
+            {nfcSupported()
+              ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג'
+              : 'NFC באתר דורש Chrome באנדרואיד עם NFC דלוק'}
+          </p>
           {error && <div className="error">{error}</div>}
           {info && <div className="ok">{info}</div>}
           <button className="clock-in" type="button" disabled={loading} onClick={() => void onClock('CLOCK_IN')}>
-            כניסה
+            {scanning && loading ? 'ממתין לתג...' : 'כניסה'}
           </button>
           <button className="clock-out" type="button" disabled={loading} onClick={() => void onClock('CLOCK_OUT')}>
-            יציאה
+            {scanning && loading ? 'ממתין לתג...' : 'יציאה'}
           </button>
           <button className="ghost" type="button" onClick={() => void openHistory()}>
             היסטוריה

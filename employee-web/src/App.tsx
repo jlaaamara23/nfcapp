@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   api,
   clearAuth,
@@ -10,7 +10,18 @@ import {
   type AuthUser,
   type TodaySummary,
 } from './api'
-import { nfcSupported, readStationFromNfc } from './nfc'
+import {
+  clearPendingClock,
+  iphoneTagHelp,
+  isIosDevice,
+  nfcSupported,
+  peekPendingClock,
+  resolveStationCode,
+  savePendingClock,
+  stationFromPageUrl,
+  tagUrlForStation,
+  type ClockMode,
+} from './nfc'
 
 type Screen = 'home' | 'history'
 
@@ -25,6 +36,8 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('home')
   const [today, setToday] = useState<TodaySummary | null>(null)
   const [history, setHistory] = useState<AttendanceRow[]>([])
+  const autoClocking = useRef(false)
+  const detectedStation = stationFromPageUrl()
 
   async function refresh(current = user) {
     if (!current) return
@@ -40,6 +53,17 @@ export default function App() {
         setUser(null)
       }
       setError(err.message)
+    })
+  }, [user])
+
+  useEffect(() => {
+    if (!user || autoClocking.current) return
+    const pending = peekPendingClock()
+    const code = stationFromPageUrl()
+    if (!pending || !code) return
+    autoClocking.current = true
+    void completeClock(user, pending, code).finally(() => {
+      autoClocking.current = false
     })
   }, [user])
 
@@ -62,18 +86,40 @@ export default function App() {
     }
   }
 
-  async function onClock(mode: 'CLOCK_IN' | 'CLOCK_OUT') {
+  async function completeClock(current: AuthUser, mode: ClockMode, code: string) {
+    setLoading(true)
+    setScanning(false)
+    setError('')
+    try {
+      const row = await api.clock(current.accessToken, mode, code)
+      setInfo(mode === 'CLOCK_IN' ? `כניסה נרשמה · ${code}` : `יציאה נרשמה · ${code}`)
+      await refresh(current)
+      setHistory((prev) => [row, ...prev].slice(0, 30))
+      clearPendingClock()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'הפעולה נכשלה')
+      setInfo('')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function onClock(mode: ClockMode) {
     if (!user) return
+    savePendingClock(mode)
     setLoading(true)
     setScanning(true)
     setError('')
-    setInfo(mode === 'CLOCK_IN' ? 'הצמידו את הטלפון לתג NFC...' : 'הצמידו את הטלפון לתג ליציאה...')
+    setInfo(
+      isIosDevice() || !nfcSupported()
+        ? 'הצמידו את האייפון לתג עכשיו. אם מופיע באנר למעלה — לחצו עליו.'
+        : mode === 'CLOCK_IN'
+          ? 'הצמידו את הטלפון לתג NFC...'
+          : 'הצמידו את הטלפון לתג ליציאה...',
+    )
     try {
-      const code = await readStationFromNfc()
-      const row = await api.clock(user.accessToken, mode, code)
-      setInfo(mode === 'CLOCK_IN' ? `כניסה נרשמה · ${code}` : `יציאה נרשמה · ${code}`)
-      await refresh(user)
-      setHistory((prev) => [row, ...prev].slice(0, 30))
+      const code = await resolveStationCode()
+      await completeClock(user, mode, code)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'הפעולה נכשלה')
       setInfo('')
@@ -94,6 +140,10 @@ export default function App() {
     }
   }
 
+  const hint = nfcSupported()
+    ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג'
+    : `באייפון לחצו כניסה והצמידו לתג. התג חייב להיות קישור, למשל ${tagUrlForStation('GATE-01')}`
+
   if (!user) {
     return (
       <div className="login-wrap">
@@ -103,7 +153,11 @@ export default function App() {
         </div>
         <form className="card stack" onSubmit={onLogin} autoComplete="off">
           <h2>כניסת עובד</h2>
-          <p className="muted">הזינו את הפרטים שקיבלתם מהמנהל</p>
+          <p className="muted">
+            {detectedStation
+              ? `זוהתה תחנה ${detectedStation}. התחברו ואז לחצו כניסה או יציאה.`
+              : 'הזינו את הפרטים שקיבלתם מהמנהל'}
+          </p>
           <label>
             שם משתמש
             <input value={username} onChange={(e) => setUsername(e.target.value)} required />
@@ -132,6 +186,7 @@ export default function App() {
           type="button"
           onClick={() => {
             clearAuth()
+            clearPendingClock()
             setUser(null)
             setScreen('home')
           }}
@@ -146,11 +201,8 @@ export default function App() {
             <strong>{today?.statusLabel || 'טוען סטטוס...'}</strong>
             <span>שעות היום: {formatHours(today?.workedMinutesToday)}</span>
           </div>
-          <p className="muted">
-            {nfcSupported()
-              ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג'
-              : 'NFC באתר דורש Chrome באנדרואיד עם NFC דלוק'}
-          </p>
+          {detectedStation && <p className="ok">תחנה מהתג: {detectedStation}</p>}
+          <p className="muted">{hint}</p>
           {error && <div className="error">{error}</div>}
           {info && <div className="ok">{info}</div>}
           <button className="clock-in" type="button" disabled={loading} onClick={() => void onClock('CLOCK_IN')}>
@@ -162,6 +214,9 @@ export default function App() {
           <button className="ghost" type="button" onClick={() => void openHistory()}>
             היסטוריה
           </button>
+          {!nfcSupported() && (
+            <p className="muted small">{iphoneTagHelp()}</p>
+          )}
         </section>
       ) : (
         <section className="card stack">

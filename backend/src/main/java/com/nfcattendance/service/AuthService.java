@@ -1,6 +1,7 @@
 package com.nfcattendance.service;
 
 import com.nfcattendance.config.AppProperties;
+import com.nfcattendance.dto.AdminUserDtos;
 import com.nfcattendance.dto.AuthDtos;
 import com.nfcattendance.entity.Employee;
 import com.nfcattendance.entity.UserAccount;
@@ -34,6 +35,25 @@ public class AuthService {
     private final JwtService jwtService;
     private final AppProperties appProperties;
     private final AuditService auditService;
+    private final AdminUserService adminUserService;
+
+    @Transactional(readOnly = true)
+    public AuthDtos.SetupStatus setupStatus() {
+        return new AuthDtos.SetupStatus(!adminUserService.existsAdmin());
+    }
+
+    @Transactional
+    public AuthDtos.AuthResponse bootstrap(AuthDtos.BootstrapRequest request) {
+        if (adminUserService.existsAdmin()) {
+            throw new ApiException(HttpStatus.CONFLICT, "כבר קיים מנהל במערכת. יש להתחבר");
+        }
+        adminUserService.createAdmin(new AdminUserDtos.CreateAdminRequest(
+                request.username(),
+                request.email(),
+                request.password()
+        ));
+        return login(new AuthDtos.LoginRequest(request.username().trim(), request.password()));
+    }
 
     @Transactional
     public AuthDtos.AuthResponse login(AuthDtos.LoginRequest request) {

@@ -2,81 +2,152 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@color/white">
-
-    <TextView
-        android:id="@+id/greetingText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/ink"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/todayStatusText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/teal_700"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/hoursText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/ink"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/clockInButton"
-        android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:layout_marginTop="28dp"
-        android:backgroundTint="@color/teal_700"
-        android:text="@string/clock_in"
-        android:textSize="22sp" />
-
-    <Button
-        android:id="@+id/clockOutButton"
-        android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:layout_marginTop="14dp"
-        android:backgroundTint="@color/amber_600"
-        android:text="@string/clock_out"
-        android:textSize="22sp" />
+    android:background="#EEF5F2"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal">
+        android:background="@color/teal_900"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
 
-        <Button
-            android:id="@+id/historyButton"
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_nfc_mark" />
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="@color/teal_900"
-            android:text="@string/history" />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/profileButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/teal_900"
-            android:text="@string/profile" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/greetingText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/teal_100"
+                android:textSize="15sp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/logoutButton"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/danger"
-        android:text="@string/logout" />
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:elevation="4dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/todayStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/ink"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/hoursText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@color/teal_700"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/clockInButton"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_button_clock_in"
+                android:text="@string/clock_in"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/clockOutButton"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_button_clock_out"
+                android:text="@string/clock_out"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/historyButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:text="@string/history"
+                    android:textAllCaps="false"
+                    android:textColor="@color/teal_700"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/profileButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_secondary"
+                    android:text="@string/profile"
+                    android:textAllCaps="false"
+                    android:textColor="@color/teal_700"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_button_secondary"
+                android:text="@string/logout"
+                android:textAllCaps="false"
+                android:textColor="@color/danger"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

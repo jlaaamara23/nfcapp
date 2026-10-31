@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: nfc-attendance-db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-nfc_attendance}
       POSTGRES_USER: ${POSTGRES_USER:-nfc_attendance}
@@ -21,6 +22,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: nfc-attendance-backend
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
@@ -29,7 +31,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-nfc_attendance}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-nfc_dev_password}
       APP_JWT_SECRET: ${APP_JWT_SECRET:-change-me-to-a-long-random-secret-at-least-32-chars}
-      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://2.24.44.228:5173,http://2.24.44.228}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:5174,http://localhost:3000,http://2.24.44.228:5173,https://admin.sreamline.tech,https://*.vercel.app}
+      APP_SEED_ENABLED: ${APP_SEED_ENABLED:-false}
     ports:
       - "8080:8080"
 
@@ -40,6 +43,7 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://2.24.44.228:8080}
     container_name: nfc-attendance-admin
+    restart: unless-stopped
     depends_on:
       - backend
     ports:

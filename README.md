@@ -10,6 +10,7 @@ Production-oriented employee attendance system with:
 workspace/
 ├── backend/           # Spring Boot REST API
 ├── admin-frontend/    # React admin panel
+├── employee-web/      # Temporary employee site for Vercel
 ├── android-app/       # Android employee NFC app
 ├── docker-compose.yml
 └── .env.example
@@ -51,6 +52,9 @@ Services:
 | Backend API | http://localhost:8080 |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Admin panel | http://localhost:5173 |
+| Employee web (local) | http://localhost:5174 |
+
+Temporary employee website (until Play Store approval): see [`employee-web/README.md`](employee-web/README.md). Deploy the `employee-web` folder to Vercel with `VITE_API_BASE_URL=https://api.sreamline.tech` and add `https://*.vercel.app` to `APP_CORS_ALLOWED_ORIGINS`.
 
 ## Local development without full Compose
 
@@ -85,15 +89,9 @@ Open http://localhost:5173
 
 See [`android-app/README.md`](android-app/README.md) for APK build/install steps.
 
-## Seed accounts (development only)
+## First login
 
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `Admin123!` |
-| Employee | `employee1` | `Employee123!` |
-| Employee | `employee2` | `Employee123!` |
-
-Seeded NFC station: `GATE-01` (registration payload shown in Admin → תחנות NFC).
+The admin login form is empty. On a new database, open the admin site and create the first admin account. Then add employees from **עובדים**. Optional demo NFC station `GATE-01` is created only when `APP_SEED_ENABLED=true`.
 
 ## Core API examples
 
@@ -102,7 +100,7 @@ Seeded NFC station: `GATE-01` (registration payload shown in Admin → תחנו�
 ```bash
 curl -s -X POST http://localhost:8080/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"Admin123!"}'
+  -d '{"username":"YOUR_ADMIN","password":"YOUR_PASSWORD"}'
 ```
 
 ### Admin list employees

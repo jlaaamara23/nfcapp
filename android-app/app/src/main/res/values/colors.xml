@@ -6,6 +6,7 @@
     <color name="amber_600">#D97706</color>
     <color name="white">#FFFFFF</color>
     <color name="ink">#16332E</color>
+    <color name="muted">#5D726C</color>
     <color name="danger">#B42318</color>
     <color name="ok">#067647</color>
 </resources>

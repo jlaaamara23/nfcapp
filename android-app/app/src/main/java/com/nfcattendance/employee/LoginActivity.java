@@ -1,8 +1,10 @@
 package com.nfcattendance.employee;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.autofill.AutofillManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,6 +20,8 @@ public class LoginActivity extends AppCompatActivity {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final ApiClient apiClient = new ApiClient();
     private SessionManager sessionManager;
+    private EditText usernameInput;
+    private EditText passwordInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,19 +34,25 @@ public class LoginActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_login);
 
-        EditText usernameInput = findViewById(R.id.usernameInput);
-        EditText passwordInput = findViewById(R.id.passwordInput);
+        usernameInput = findViewById(R.id.usernameInput);
+        passwordInput = findViewById(R.id.passwordInput);
         TextView errorText = findViewById(R.id.errorText);
         Button loginButton = findViewById(R.id.loginButton);
 
-        usernameInput.setText("employee1");
-        passwordInput.setText("Employee123!");
+        disableAutofill();
+        clearCredentials();
 
         loginButton.setOnClickListener(v -> {
             errorText.setVisibility(View.GONE);
             loginButton.setEnabled(false);
             String username = usernameInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
+            if (username.isEmpty() || password.isEmpty()) {
+                errorText.setText("יש למלא שם משתמש וסיסמה");
+                errorText.setVisibility(View.VISIBLE);
+                loginButton.setEnabled(true);
+                return;
+            }
             executor.execute(() -> {
                 try {
                     JsonObject auth = apiClient.login(username, password);
@@ -77,6 +87,32 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        clearCredentials();
+        usernameInput.post(this::clearCredentials);
+    }
+
+    private void clearCredentials() {
+        if (usernameInput != null) {
+            usernameInput.setText("");
+        }
+        if (passwordInput != null) {
+            passwordInput.setText("");
+        }
+    }
+
+    private void disableAutofill() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getWindow().getDecorView().setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS);
+            AutofillManager autofillManager = getSystemService(AutofillManager.class);
+            if (autofillManager != null) {
+                autofillManager.cancel();
+            }
+        }
     }
 
     @Override

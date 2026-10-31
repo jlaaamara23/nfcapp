@@ -17,15 +17,39 @@ function authHeader(): HeadersInit {
   return { Authorization: `Bearer ${parsed.accessToken}` };
 }
 
+export class AuthExpiredError extends Error {
+  constructor(message = 'יש להתחבר') {
+    super(message);
+    this.name = 'AuthExpiredError';
+  }
+}
+
+function clearStoredAuth() {
+  localStorage.removeItem('nfc_admin_auth');
+  window.dispatchEvent(new Event('nfc-auth-expired'));
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeader(),
-      ...(init.headers || {}),
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader(),
+        ...(init.headers || {}),
+      },
+    });
+  } catch {
+    throw new Error('לא ניתן להתחבר לשרת');
+  }
+  const publicAuth = path.startsWith('/api/auth/login')
+    || path.startsWith('/api/auth/bootstrap')
+    || path.startsWith('/api/auth/setup-status');
+  if (response.status === 401 && !publicAuth) {
+    clearStoredAuth();
+    throw new AuthExpiredError();
+  }
   if (!response.ok) {
     let message = 'שגיאת שרת';
     try {
@@ -42,6 +66,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
+  setupStatus: () => request<{ needsBootstrap: boolean }>('/api/auth/setup-status'),
+  bootstrap: (username: string, email: string, password: string) =>
+    request<AuthUser>('/api/auth/bootstrap', {
+      method: 'POST',
+      body: JSON.stringify({ username, email, password }),
+    }),
   login: (username: string, password: string) =>
     request<AuthUser>('/api/auth/login', {
       method: 'POST',

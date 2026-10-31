@@ -5,8 +5,8 @@ import { useAuth } from '../auth/AuthContext';
 
 export function LoginPage() {
   const { user, login, isAdmin } = useAuth();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin123!');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,13 +30,19 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-backdrop" />
-      <form className="login-panel" onSubmit={onSubmit}>
+      <form className="login-panel" onSubmit={onSubmit} autoComplete="off">
         <p className="eyebrow">מערכת נוכחות NFC</p>
         <h1>כניסת מנהל</h1>
         <p className="muted">גישה ללוח הניהול מותרת למשתמשי ADMIN בלבד.</p>
         <label>
           שם משתמש
-          <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+          <input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
+            name="nfc-admin-username"
+            required
+          />
         </label>
         <label>
           סיסמה
@@ -44,7 +50,9 @@ export function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
+            autoComplete="new-password"
+            name="nfc-admin-password"
+            required
           />
         </label>
         {error && <div className="error">{error}</div>}

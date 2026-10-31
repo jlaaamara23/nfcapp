@@ -1,6 +1,8 @@
 package com.nfcattendance.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.util.Set;
@@ -11,6 +13,14 @@ public final class AuthDtos {
     public record LoginRequest(
             @NotBlank String username,
             @NotBlank String password
+    ) {}
+
+    public record SetupStatus(boolean needsBootstrap) {}
+
+    public record BootstrapRequest(
+            @NotBlank String username,
+            @NotBlank @Email String email,
+            @NotBlank @Size(min = 8, message = "הסיסמה חייבת להכיל לפחות 8 תווים") String password
     ) {}
 
     @Builder

@@ -4,6 +4,7 @@ import {
   iphoneTagHelp,
   peekPendingClock,
   savePendingClock,
+  stationFromPageUrl,
   tagUrlForStation,
   takePendingClock,
 } from './nfc'
@@ -51,6 +52,16 @@ describe('extractStationCode', () => {
     const payload =
       'https://nfcapp-nine.vercel.app/?station=GATE-01#nfcattendance://station/GATE-01?rv=NFC-ABC'
     expect(extractStationCode(payload)).toBe('GATE-01')
+  })
+
+  it('does not treat the employee website address as a station', () => {
+    expect(extractStationCode('https://nfcapp-nine.vercel.app/')).toBeNull()
+    expect(extractStationCode('https://nfcapp-nine.vercel.app')).toBeNull()
+    expect(stationFromPageUrl('https://nfcapp-nine.vercel.app/')).toBeNull()
+  })
+
+  it('still accepts a short tag text', () => {
+    expect(extractStationCode('GATE-01')).toBe('GATE-01')
   })
 })
 

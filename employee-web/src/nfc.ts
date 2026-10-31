@@ -29,6 +29,15 @@ export function isIosDevice(): boolean {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent)
 }
 
+export function isValidStationCode(code: string | null | undefined): code is string {
+  if (!code) return false
+  const value = code.trim().toUpperCase()
+  if (value.length < 3 || value.length > 32) return false
+  if (!/^[A-Z0-9]+(?:-[A-Z0-9]+)*$/.test(value)) return false
+  if (value.includes('HTTP') || value.includes('WWW') || value.includes('VERCEL')) return false
+  return true
+}
+
 export function extractStationCode(raw: string | null | undefined): string | null {
   if (!raw || !raw.trim()) return null
   let value = raw.trim()
@@ -37,31 +46,48 @@ export function extractStationCode(raw: string | null | undefined): string | nul
     value = value.slice(idx)
   }
   const match = value.match(/nfcattendance:\/\/station\/([^/?#]+)/i)
-  if (match?.[1]) {
+  if (match?.[1] && isValidStationCode(decodeURIComponent(match[1]))) {
     return decodeURIComponent(match[1]).toUpperCase()
   }
   try {
     const url = new URL(value)
     const fromQuery = url.searchParams.get('station') || url.searchParams.get('st')
-    if (fromQuery) {
+    if (isValidStationCode(fromQuery)) {
       return fromQuery.trim().toUpperCase()
     }
     const pathMatch = url.pathname.match(/\/station\/([^/]+)/i)
-    if (pathMatch?.[1]) {
+    if (pathMatch?.[1] && isValidStationCode(decodeURIComponent(pathMatch[1]))) {
       return decodeURIComponent(pathMatch[1]).toUpperCase()
     }
+    return null
   } catch {
-    /* not a URL */
+    /* not a URL — allow a short tag text like GATE-01 */
   }
-  const compact = value.replace(/[^A-Za-z0-9-]/g, '')
-  if (/^[A-Z0-9-]{3,}$/i.test(compact)) {
-    return compact.toUpperCase()
+  if (isValidStationCode(value)) {
+    return value.trim().toUpperCase()
   }
   return null
 }
 
 export function stationFromPageUrl(href = typeof window === 'undefined' ? '' : window.location.href): string | null {
-  return extractStationCode(href)
+  if (!href) return null
+  try {
+    const url = new URL(href)
+    const fromQuery = url.searchParams.get('station') || url.searchParams.get('st')
+    if (isValidStationCode(fromQuery)) {
+      return fromQuery.trim().toUpperCase()
+    }
+    const pathMatch = url.pathname.match(/\/station\/([^/]+)/i)
+    if (pathMatch?.[1] && isValidStationCode(decodeURIComponent(pathMatch[1]))) {
+      return decodeURIComponent(pathMatch[1]).toUpperCase()
+    }
+    if (url.hash) {
+      return extractStationCode(url.hash.slice(1))
+    }
+  } catch {
+    return null
+  }
+  return null
 }
 
 export function tagUrlForStation(code: string, registrationValue?: string): string {

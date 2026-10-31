@@ -87,7 +87,14 @@ public class SecurityConfig {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
-        config.setAllowedOrigins(origins);
+        List<String> exact = origins.stream().filter(origin -> !origin.contains("*")).toList();
+        List<String> patterns = origins.stream().filter(origin -> origin.contains("*")).toList();
+        if (!exact.isEmpty()) {
+            config.setAllowedOrigins(exact);
+        }
+        if (!patterns.isEmpty()) {
+            config.setAllowedOriginPatterns(patterns);
+        }
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

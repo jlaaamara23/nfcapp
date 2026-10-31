@@ -84,6 +84,12 @@ label {
   margin: 0 0 1rem;
 }
 
+.muted.small {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
 .stack { display: grid; gap: 0.85rem; }
 
 .primary, .clock-in, .clock-out, .ghost {

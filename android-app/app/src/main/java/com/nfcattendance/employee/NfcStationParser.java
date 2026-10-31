@@ -11,6 +11,7 @@ import android.os.Parcelable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 public final class NfcStationParser {
     private NfcStationParser() {}
@@ -79,6 +80,12 @@ public final class NfcStationParser {
         return new String(record.getPayload(), StandardCharsets.UTF_8);
     }
 
+    private static int indexOfHttp(String value) {
+        int https = value.toLowerCase().indexOf("https://");
+        if (https >= 0) return https;
+        return value.toLowerCase().indexOf("http://");
+    }
+
     static String extractStationCode(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -93,6 +100,21 @@ public final class NfcStationParser {
             Uri uri = Uri.parse(value);
             String last = uri.getLastPathSegment();
             return last != null ? last.toUpperCase() : null;
+        }
+        int httpAt = indexOfHttp(value);
+        if (httpAt >= 0) {
+            Uri web = Uri.parse(value.substring(httpAt).trim());
+            String fromQuery = web.getQueryParameter("station");
+            if (fromQuery == null) {
+                fromQuery = web.getQueryParameter("st");
+            }
+            if (fromQuery != null && !fromQuery.isBlank()) {
+                return fromQuery.trim().toUpperCase();
+            }
+            List<String> segs = web.getPathSegments();
+            if (segs.size() >= 2 && "station".equalsIgnoreCase(segs.get(segs.size() - 2))) {
+                return segs.get(segs.size() - 1).toUpperCase();
+            }
         }
         if (value.matches("(?i)GATE-[A-Z0-9-]+") || value.matches("(?i)[A-Z0-9-]{3,}")) {
             return value.toUpperCase();

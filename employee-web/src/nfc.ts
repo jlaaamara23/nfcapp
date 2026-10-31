@@ -30,11 +30,37 @@ export function extractStationCode(raw: string | null | undefined): string | nul
   if (match?.[1]) {
     return decodeURIComponent(match[1]).toUpperCase()
   }
+  try {
+    const url = new URL(value)
+    const fromQuery = url.searchParams.get('station') || url.searchParams.get('st')
+    if (fromQuery) {
+      return fromQuery.trim().toUpperCase()
+    }
+  } catch {
+    /* not a URL */
+  }
   const compact = value.replace(/[^A-Za-z0-9-]/g, '')
   if (/^[A-Z0-9-]{3,}$/i.test(compact)) {
     return compact.toUpperCase()
   }
   return null
+}
+
+export function stationFromPageUrl(href = window.location.href): string | null {
+  return extractStationCode(href)
+}
+
+export async function resolveStationCode(): Promise<string> {
+  if (nfcSupported()) {
+    return readStationFromNfc()
+  }
+  const fromUrl = stationFromPageUrl()
+  if (fromUrl) {
+    return fromUrl
+  }
+  throw new Error(
+    'באייפון אי אפשר לקרוא תג מתוך האתר. כתבו על התג כתובת: https://nfcapp-nine.vercel.app/?station=GATE-01 ואז הצמידו את האייפון לתג ממסך הבית.',
+  )
 }
 
 function decodeRecord(record: { recordType?: string; data?: BufferSource }): string {

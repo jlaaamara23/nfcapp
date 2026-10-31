@@ -10,7 +10,7 @@ import {
   type AuthUser,
   type TodaySummary,
 } from './api'
-import { nfcSupported, readStationFromNfc } from './nfc'
+import { nfcSupported, resolveStationCode } from './nfc'
 
 type Screen = 'home' | 'history'
 
@@ -69,7 +69,7 @@ export default function App() {
     setError('')
     setInfo(mode === 'CLOCK_IN' ? 'הצמידו את הטלפון לתג NFC...' : 'הצמידו את הטלפון לתג ליציאה...')
     try {
-      const code = await readStationFromNfc()
+      const code = await resolveStationCode()
       const row = await api.clock(user.accessToken, mode, code)
       setInfo(mode === 'CLOCK_IN' ? `כניסה נרשמה · ${code}` : `יציאה נרשמה · ${code}`)
       await refresh(user)
@@ -149,7 +149,7 @@ export default function App() {
           <p className="muted">
             {nfcSupported()
               ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג'
-              : 'NFC באתר דורש Chrome באנדרואיד עם NFC דלוק'}
+              : 'באייפון: הצמידו את הטלפון לתג ממסך הבית (התג חייב להיות קישור לאתר). באנדרואיד פתחו Chrome.'}
           </p>
           {error && <div className="error">{error}</div>}
           {info && <div className="ok">{info}</div>}

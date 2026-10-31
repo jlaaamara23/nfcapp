@@ -13,4 +13,8 @@ describe('extractStationCode', () => {
   it('returns null for empty input', () => {
     expect(extractStationCode('')).toBeNull()
   })
+
+  it('reads station from the employee website URL', () => {
+    expect(extractStationCode('https://nfcapp-nine.vercel.app/?station=GATE-01')).toBe('GATE-01')
+  })
 })

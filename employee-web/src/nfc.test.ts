@@ -46,6 +46,12 @@ describe('extractStationCode', () => {
   it('reads station from a path URL', () => {
     expect(extractStationCode('https://nfcapp-nine.vercel.app/station/GATE-01')).toBe('GATE-01')
   })
+
+  it('reads one unified payload for iPhone and Galaxy', () => {
+    const payload =
+      'https://nfcapp-nine.vercel.app/?station=GATE-01#nfcattendance://station/GATE-01?rv=NFC-ABC'
+    expect(extractStationCode(payload)).toBe('GATE-01')
+  })
 })
 
 describe('iPhone tag URL helpers', () => {
@@ -58,12 +64,14 @@ describe('iPhone tag URL helpers', () => {
   })
 
   it('builds a URL iPhone can open from the tag', () => {
-    expect(tagUrlForStation('gate-01')).toBe('https://nfcapp-nine.vercel.app/?station=GATE-01')
+    expect(tagUrlForStation('gate-01')).toBe(
+      'https://nfcapp-nine.vercel.app/?station=GATE-01#nfcattendance://station/GATE-01',
+    )
   })
 
   it('explains that Safari cannot scan inside the page', () => {
     expect(iphoneTagHelp()).toContain('GATE-01')
-    expect(iphoneTagHelp()).toContain('ספארי')
+    expect(iphoneTagHelp()).toContain('גלקסי')
   })
 
   it('stores and consumes a pending clock action after the tag reloads the page', () => {

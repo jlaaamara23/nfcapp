@@ -19,7 +19,6 @@ import {
   resolveStationCode,
   savePendingClock,
   stationFromPageUrl,
-  tagUrlForStation,
   type ClockMode,
 } from './nfc'
 
@@ -47,13 +46,25 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return
-    refresh(user).catch((err: Error) => {
-      if (err.message.includes('התחבר') || err.message.includes('401')) {
-        clearAuth()
-        setUser(null)
-      }
-      setError(err.message)
-    })
+    const load = () => {
+      refresh(user).catch((err: Error) => {
+        if (err.message.includes('התחבר') || err.message.includes('401')) {
+          clearAuth()
+          setUser(null)
+        }
+        setError(err.message)
+      })
+    }
+    load()
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') load()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
   }, [user])
 
   useEffect(() => {
@@ -141,8 +152,8 @@ export default function App() {
   }
 
   const hint = nfcSupported()
-    ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג'
-    : `באייפון לחצו כניסה והצמידו לתג. התג חייב להיות קישור, למשל ${tagUrlForStation('GATE-01')}`
+    ? 'לחצו כניסה או יציאה והצמידו את הטלפון לתג. כניסה מגלקסי ומאייפון נשמרת באותו חשבון בשרת.'
+    : `תג אחד לאייפון ולגלקסי. לחצו כניסה והצמידו לתג. אם מופיע באנר — לחצו עליו.`
 
   if (!user) {
     return (

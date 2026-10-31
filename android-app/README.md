@@ -49,11 +49,13 @@ If the Gradle wrapper is not present yet, open the project once in Android Studi
 
 ## NFC tag payload
 
-Write an NDEF URI/Text record to the tag using the Admin panel payload, for example:
+Write a single NDEF URI record from the Admin panel payload. One string serves iPhone and Galaxy:
 
 ```text
-nfcattendance://station/GATE-01?rv=NFC-XXXXXXXXXXXXXXXX
+https://nfcapp-nine.vercel.app/?station=GATE-01#nfcattendance://station/GATE-01?rv=NFC-XXXXXXXXXXXXXXXX
 ```
+
+Do not write two separate formats onto the same tag — the second write overwrites the first.
 
 The app extracts `GATE-01` and sends it with the authenticated employee JWT. The phone clock is never trusted as the attendance timestamp.
 

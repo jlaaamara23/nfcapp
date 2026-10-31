@@ -7,7 +7,9 @@ import com.nfcattendance.entity.Workplace;
 import com.nfcattendance.exception.ApiException;
 import com.nfcattendance.repository.NfcStationRepository;
 import com.nfcattendance.repository.WorkplaceRepository;
+import com.nfcattendance.util.NfcTagPayload;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,9 @@ public class NfcStationService {
     private final NfcStationRepository nfcStationRepository;
     private final WorkplaceRepository workplaceRepository;
     private final AuditService auditService;
+
+    @Value("${app.employee-web-url:https://nfcapp-nine.vercel.app}")
+    private String employeeWebUrl;
 
     @Transactional(readOnly = true)
     public List<NfcStationDtos.StationResponse> list() {
@@ -70,7 +75,7 @@ public class NfcStationService {
     }
 
     private NfcStationDtos.StationResponse toResponse(NfcStation s) {
-        String payload = "nfcattendance://station/" + s.getStationCode() + "?rv=" + s.getRegistrationValue();
+        String payload = NfcTagPayload.unified(employeeWebUrl, s.getStationCode(), s.getRegistrationValue());
         return NfcStationDtos.StationResponse.builder()
                 .id(s.getId())
                 .stationCode(s.getStationCode())
